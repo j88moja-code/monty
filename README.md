@@ -12,12 +12,12 @@ The goal of this project is to create an interpreter for Monty ByteCodes files.
 
 * [monty_header.h]() - header file for all the prototype functions for the project.
 
-* [0. push, pall] - Implement the `push` and `pall` opcodes.
-* [1. pint] - Implement the `pint` opcode.
-* [2. pop] - Implement the `pop` opcode.
-* [3. swap] - Implement the `swap` opcode.
-* [4. add] - Implement the `add` opcode.
-* [5. nop] - Implement the `nop` opcode.
+* 0. push, pall - Implement the `push` and `pall` opcodes.
+* 1. pint - Implement the `pint` opcode.
+* 2. pop - Implement the `pop` opcode.
+* 3. swap - Implement the `swap` opcode.
+* 4. add - Implement the `add` opcode.
+* 5. nop - Implement the `nop` opcode.
 
 ## ``advanced tasks`` 
 
