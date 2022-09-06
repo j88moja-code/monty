@@ -10,6 +10,8 @@ The goal of this project is to create an interpreter for Monty ByteCodes files.
 
 ## ``mandatory tasks``
 
+* [monty_header.h]() - header file for all the prototype functions for the project.
+
 * [0. push, pall] - Implement the `push` and `pall` opcodes.
 * [1. pint] - Implement the `pint` opcode.
 * [2. pop] - Implement the `pop` opcode.
@@ -18,3 +20,7 @@ The goal of this project is to create an interpreter for Monty ByteCodes files.
 * [5. nop] - Implement the `nop` opcode.
 
 ## ``advanced tasks`` 
+
+## Author(s)
+
+* [ntobeko sithole]() - Linkin Profile
