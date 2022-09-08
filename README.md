@@ -34,4 +34,4 @@ The goal of this project is to create an interpreter for Monty ByteCodes files.
 
 ## Author(s)
 
-* [Ntobeko Sithole](https://www.linkedin.com/in/ntobeko-sithole-4487a9124/) - Linkin Profile
+* [Ntobeko Sithole](https://www.linkedin.com/in/ntobeko-sithole-4487a9124/) 
