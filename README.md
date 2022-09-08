@@ -32,6 +32,5 @@ The goal of this project is to create an interpreter for Monty ByteCodes files.
 * 14. rotr - Implement the `rotr` opcode.
 * 15. stack, queue - Implement the `stack` and `queue` opcodes.
 
-## Author(s)
 
-* [Ntobeko Sithole](https://www.linkedin.com/in/ntobeko-sithole-4487a9124/) 
+
