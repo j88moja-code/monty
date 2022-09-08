@@ -8,9 +8,9 @@ The goal of this project is to create an interpreter for Monty ByteCodes files.
 
 ## Contents
 
-## ``mandatory tasks``
+* [monty_header.h](https://github.com/j88moja-code/monty/blob/main/monty_header.h) - header     file for all the prototype functions for the project.
 
-* [monty_header.h](https://github.com/j88moja-code/monty/blob/main/monty_header.h) - header file for all the prototype functions for the project.
+## ``mandatory tasks``
 
 * 0. push, pall - Implement the `push` and `pall` opcodes.
 * 1. pint - Implement the `pint` opcode.
