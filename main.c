@@ -1,22 +1,16 @@
 #include "monty_header.h"
-#include <stdio.h>
-#include <string.h>
 
-/* global struct to hold flag for queue and stack length */
-var_t var;
+char **op_toks = NULL;
 
 /**
- * get_op - check op against valid opcodes
- * @op: op to check
- * @stack: double pointer to the beginnig of the stack
- * @line_number: script line number
+ * get_op_func - Matches an opcode with its corresponding function.
+ * @opcode: The opcode to match.
  *
- * Return: void
+ * Return: A pointer to the corresponding function.
  */
-void get_op(char *op, stack_t **stack, unsigned int line_number)
+void (*get_op_func(char *opcode))(stack_t**, unsigned int)
 {
-	size_t i;
-	instruction_t valid_ops[] = {
+	instruction_t op_funcs[] = {
 		{"push", _push},
 		{"pall", _pall},
 		{"pint", _pint},
@@ -26,61 +20,102 @@ void get_op(char *op, stack_t **stack, unsigned int line_number)
 		{"nop", m_nop},
 		{NULL, NULL}
 	};
+	int i;
 
-	for (i = 0; valid_ops[i].opcode != NULL; i++)
+	for (i = 0; op_funcs[i].opcode; i++)
 	{
-		if (strcmp(valid_ops[i].opcode, op) == 0)
-		{
-			valid_ops[i].f(stack, line_number);
-			return;
-		}
+		if (strcmp(opcode, op_funcs[i].opcode) == 0)
+			return (op_funcs[i].f);
 	}
 
-	dprintf(STDOUT_FILENO,
-		"L%u: unknown instruction %s\n",
-		line_number, op);
-	exit(EXIT_FAILURE);
+	return (NULL);
 }
 
 /**
- * main - Monty bytecode interpreter
- * @argc: number of arguments passed
- * @argv: array of argument strings
+ * run_monty - Primary function to execute a Monty bytecodes script.
+ * @script_fd: File descriptor for an open Monty bytecodes script.
  *
- * Return: EXIT_SUCCESS on success or EXIT_FAILURE on failure
+ * Return: EXIT_SUCCESS on success, respective error code on failure.
  */
-int main(int argc, char *argv[])
+int run_monty(FILE *script_fd)
 {
 	stack_t *stack = NULL;
-	unsigned int line_number = 0;
-	FILE *fs = NULL;
-	char *lineptr = NULL, *op = NULL;
-	size_t n = 0;
+	char *line = NULL;
+	size_t len = 0, exit_status = EXIT_SUCCESS;
+	unsigned int line_number = 0, prev_tok_len = 0;
+	void (*op_func)(stack_t**, unsigned int);
 
-	var.queue = 0;
-	var.stack_len = 0;
-	if (argc != 2)
-	{
-		dprintf(STDOUT_FILENO, "USAGE: monty file\n");
-		exit(EXIT_FAILURE);
-	}
-	fs = fopen(argv[1], "r");
-	if (fs == NULL)
-	{
-		dprintf(STDOUT_FILENO, "Error: Can't open file %s\n", argv[1]);
-		exit(EXIT_FAILURE);
-	}
-	on_exit(free_lineptr, &lineptr);
-	on_exit(free_stack, &stack);
-	on_exit(m_fs_close, fs);
-	while (getline(&lineptr, &n, fs) != -1)
+	if (init_stack(&stack) == EXIT_FAILURE)
+		return (EXIT_FAILURE);
+
+	while (getline(&line, &len, script_fd) != -1)
 	{
 		line_number++;
-		op = strtok(lineptr, "\n\t\r ");
-		if (op != NULL && op[0] != '#')
+		op_toks = strtow(line, DELIMS);
+		if (op_toks == NULL)
 		{
-			get_op(op, &stack, line_number);
+			if (is_empty_line(line, DELIMS))
+				continue;
+			free_stack(&stack);
+			return (malloc_error());
 		}
+		else if (op_toks[0][0] == '#') /* comment line */
+		{
+			free_tokens();
+			continue;
+		}
+		op_func = get_op_func(op_toks[0]);
+		if (op_func == NULL)
+		{
+			free_stack(&stack);
+			exit_status = unknown_op_error(op_toks[0], line_number);
+			free_tokens();
+			break;
+		}
+		prev_tok_len = token_arr_len();
+		op_func(&stack, line_number);
+		if (token_arr_len() != prev_tok_len)
+		{
+			if (op_toks && op_toks[prev_tok_len])
+				exit_status = atoi(op_toks[prev_tok_len]);
+			else
+				exit_status = EXIT_FAILURE;
+			free_tokens();
+			break;
+		}
+		free_tokens();
 	}
-	exit(EXIT_SUCCESS);
+	free_stack(&stack);
+
+	if (line && *line == 0)
+	{
+		free(line);
+		return (malloc_error());
+	}
+
+	free(line);
+	return (exit_status);
+}
+
+/**
+ * main - the entry point for Monty Interp
+ *
+ * @argc: the count of arguments passed to the program
+ * @argv: pointer to an array of char pointers to arguments
+ *
+ * Return: (EXIT_SUCCESS) on success (EXIT_FAILURE) on error
+ */
+int main(int argc, char **argv)
+{
+	FILE *script_fd = NULL;
+	int exit_code = EXIT_SUCCESS;
+
+	if (argc != 2)
+		return (usage_error());
+	script_fd = fopen(argv[1], "r");
+	if (script_fd == NULL)
+		return (f_open_error(argv[1]));
+	exit_code = run_monty(script_fd);
+	fclose(script_fd);
+	return (exit_code);
 }
