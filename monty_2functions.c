@@ -9,18 +9,14 @@
  */
 void _add(stack_t **stack, unsigned int line_number)
 {
-	int n = 0;
-
-	if (var.stack_len < 2)
+	if ((*stack)->next == NULL || (*stack)->next->next == NULL)
 	{
-		dprintf(STDOUT_FILENO,
-			"L%u: can't add, stack too short\n",
-			line_number);
-		exit(EXIT_FAILURE);
+		set_op_tok_error(short_stack_error(line_number, "add"));
+		return;
 	}
-	n += (*stack)->n;
+
+	(*stack)->next->next->n += (*stack)->next->n;
 	_pop(stack, line_number);
-	(*stack)->n += n;
 }
 
 /**

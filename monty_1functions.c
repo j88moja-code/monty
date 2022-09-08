@@ -11,24 +11,52 @@
 
 void _push(stack_t **stack, unsigned int line_number)
 {
-	char *arg;
-	int n;
+	stack_t *tmp, *new;
+	int i;
 
-	arg = strtok(NULL, "\n\t\r ");
-	if (arg == NULL || check_for_digit(arg))
+	new = malloc(sizeof(stack_t));
+	if (new == NULL)
 	{
-		dprintf(STDOUT_FILENO,
-			"L%u: usage: push integer\n",
-			line_number);
-		exit(EXIT_FAILURE);
+		set_op_tok_error(malloc_error());
+		return;
 	}
-	n = atoi(arg);
-	if (!add_node(stack, n))
+
+	if (op_toks[1] == NULL)
 	{
-		dprintf(STDOUT_FILENO, "Error: malloc failed\n");
-		exit(EXIT_FAILURE);
+		set_op_tok_error(no_int_error(line_number));
+		return;
 	}
-	var.stack_len++;
+
+	for (i = 0; op_toks[1][i]; i++)
+	{
+		if (op_toks[1][i] == '-' && i == 0)
+			continue;
+		if (op_toks[1][i] < '0' || op_toks[1][i] > '9')
+		{
+			set_op_tok_error(no_int_error(line_number));
+			return;
+		}
+	}
+	new->n = atoi(op_toks[1]);
+
+	if (check_mode(*stack) == STACK)
+	{
+		tmp = (*stack)->next;
+		new->prev = *stack;
+		new->next = tmp;
+		if (tmp)
+			tmp->prev = new;
+		(*stack)->next = new;
+	}
+	else
+	{
+		tmp = *stack;
+		while (tmp->next)
+			tmp = tmp->next;
+		new->prev = tmp;
+		new->next = NULL;
+		tmp->next = new;
+	}
 }
 
 /**
@@ -42,20 +70,14 @@ void _push(stack_t **stack, unsigned int line_number)
 
 void _pall(stack_t **stack, unsigned int line_number)
 {
-	stack_t *head;
+	stack_t *tmp = (*stack)->next;
 
-	(void)(line_number);
-
-	head = *stack;
-	while (head != NULL)
+	while (tmp)
 	{
-		printf("%d\n", head->n);
-		head = head->next;
-		if (head == *stack)
-		{
-			return;
-		}
+		printf("%d\n", tmp->n);
+		tmp = tmp->next;
 	}
+	(void)line_number;
 }
 
 /**
@@ -69,16 +91,13 @@ void _pall(stack_t **stack, unsigned int line_number)
 
 void _pint(stack_t **stack, unsigned int line_number)
 {
-	stack_t *head = *stack;
-
-	if (var.stack_len == 0)
+	if ((*stack)->next == NULL)
 	{
-		dprintf(STDOUT_FILENO,
-			"L%u: can't pint, stack empty\n",
-			line_number);
-		exit(EXIT_FAILURE);
+		set_op_tok_error(pop_error(line_number));
+		return;
 	}
-	printf("%d\n", head->n);
+
+	printf("%d\n", (*stack)->next->n);
 }
 
 /**
@@ -92,23 +111,19 @@ void _pint(stack_t **stack, unsigned int line_number)
 
 void _pop(stack_t **stack, unsigned int line_number)
 {
-	stack_t *pop = *stack;
+	stack_t *next = NULL;
 
-	if (var.stack_len == 0)
+	if ((*stack)->next == NULL)
 	{
-		dprintf(STDOUT_FILENO,
-			"L%u: can't pop an empty stack\n",
-			line_number);
-		exit(EXIT_FAILURE);
+		set_op_tok_error(pop_error(line_number));
+		return;
 	}
-	(*stack)->next->prev = (*stack)->prev;
-	(*stack)->prev->next = (*stack)->next;
-	if (var.stack_len != 1)
-		*stack = (*stack)->next;
-	else
-		*stack = NULL;
-	free(pop);
-	var.stack_len--;
+
+	next = (*stack)->next->next;
+	free((*stack)->next);
+	if (next)
+		next->prev = *stack;
+	(*stack)->next = next;
 }
 
 /**
@@ -122,26 +137,20 @@ void _pop(stack_t **stack, unsigned int line_number)
 
 void _swap(stack_t **stack, unsigned int line_number)
 {
-	stack_t *next;
+	stack_t *tmp;
 
-	if (var.stack_len < 2)
+	if ((*stack)->next == NULL || (*stack)->next->next == NULL)
 	{
-		dprintf(STDOUT_FILENO,
-			"L%u: can't swap, stack too short\n",
-			line_number);
-		exit(EXIT_FAILURE);
-	}
-	if (var.stack_len == 2)
-	{
-		*stack = (*stack)->next;
+		set_op_tok_error(short_stack_error(line_number, "swap"));
 		return;
 	}
-	next = (*stack)->next;
-	next->prev = (*stack)->prev;
-	(*stack)->prev->next = next;
-	(*stack)->prev = next;
-	(*stack)->next = next->next;
-	next->next->prev = *stack;
-	next->next = *stack;
-	*stack = next;
+
+	tmp = (*stack)->next->next;
+	(*stack)->next->next = tmp->next;
+	(*stack)->next->prev = tmp;
+	if (tmp->next)
+		tmp->next->prev = (*stack)->next;
+	tmp->next = (*stack)->next;
+	tmp->prev = *stack;
+	(*stack)->next = tmp;
 }
