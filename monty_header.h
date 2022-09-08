@@ -14,20 +14,10 @@
 
 #define STACK 0
 #define QUEUE 1
-
-/**
- * struct var_s - struct to contain the main variables of the Monty interpreter
- * @queue: flag to determine if in stack vs queue mode
- * @stack_len: length of the stack
- */
-typedef struct var_s
-{
-	int queue;
-	size_t stack_len;
-} var_t;
+#define DELIMS " \n\t\a\b"
 
 /* GLOBAL OPCODE TOKENS */
-extern var_t var;
+extern char **op_toks;
 
 /* STRUCS */
 /**
@@ -61,14 +51,47 @@ typedef struct instruction_s
 } instruction_t;
 
 /* PROTOTYPES */
-/* init */
-void get_op(char *op, stack_t **stack, unsigned int line_number);
-void free_stack(int status, void *arg);
-void m_fs_close(int status, void *arg);
-void free_lineptr(int status, void *arg);
-stack_t *add_node(stack_t **stack, const int n);
 
-int check_for_digit(char *arg);
+void set_op_tok_error(int error_code);
+/* converters */
+
+char *get_int(int num);
+unsigned int _abs(int);
+int get_numbase_len(unsigned int num, unsigned int base);
+void fill_numbase_buff(unsigned int num, unsigned int base,
+		       char *buff, int buff_size);
+
+/* init and main */
+void free_tokens(void);
+unsigned int token_arr_len(void);
+int is_empty_line(char *line, char *delims);
+void (*get_op_func(char *opcode))(stack_t**, unsigned int);
+int run_monty(FILE *script_fd);
+
+/* stack */
+void free_stack(stack_t **stack);
+int init_stack(stack_t **stack);
+int check_mode(stack_t *stack);
+
+/* parser */
+char **strtow(char *str, char *delims);
+int is_delim(char ch, char *delims);
+int get_word_length(char *str, char *delims);
+int get_word_count(char *str, char *delims);
+char *get_next_word(char *str, char *delims);
+
+
+/* errors and error messages */
+int usage_error(void);
+int malloc_error(void);
+int f_open_error(char *filename);
+int unknown_op_error(char *opcode, unsigned int line_number);
+int no_int_error(unsigned int line_number);
+int short_stack_error(unsigned int line_number, char *op);
+int div_error(unsigned int line_number);
+int pop_error(unsigned int line_number);
+int div_error(unsigned int line_number);
+int pchar_error(unsigned int line_number, char *message);
 
 /* opcodes */
 void _push(stack_t **stack, unsigned int line_number);
