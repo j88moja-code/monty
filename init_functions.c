@@ -1,100 +1,57 @@
 #include "monty_header.h"
 
 /**
- * free_lineptr - free line pointer returned by getline
- * @status: exit status
- * @arg: pointer to line
- *
- * Return: void
+ * free_tokens - Frees the global op_toks array of strings.
  */
-void free_lineptr(int status, void *arg)
+void free_tokens(void)
 {
-	char **lineptr = arg;
+	size_t i = 0;
 
-	(void)status;
-	if (*lineptr != NULL)
-		free(*lineptr);
+	if (op_toks == NULL)
+		return;
+
+	for (i = 0; op_toks[i]; i++)
+		free(op_toks[i]);
+
+	free(op_toks);
 }
 
 /**
- * free_stack - frees the stack on exit
- * @status: exit status
- * @arg: double pointer to the stack
+ * token_arr_len - Gets the length of current op_toks.
  *
- * Return: void
+ * Return: Length of current op_toks (as int).
  */
-void free_stack(int status, void *arg)
+unsigned int token_arr_len(void)
 {
-	stack_t **stack;
-	stack_t *next;
+	unsigned int toks_len = 0;
 
-	(void)status;
-
-	stack = (stack_t **)arg;
-	if (*stack)
-	{
-		(*stack)->prev->next = NULL;
-		(*stack)->prev = NULL;
-	}
-	while (*stack != NULL)
-	{
-		next = (*stack)->next;
-		free(*stack);
-		*stack = next;
-	}
-	var.stack_len = 0;
+	while (op_toks[toks_len])
+		toks_len++;
+	return (toks_len);
 }
 
 /**
- * add_node - add a new node to a circular linked list
- * @stack: double pointer to the beginning of the circular linked list
- * @n: value to add to the new node
+ * is_empty_line - Checks if a line read from getline only contains delimiters.
+ * @line: A pointer to the line.
+ * @delims: A string of delimiter characters.
  *
- * Description: the function will add the node to the begining if in
- * stack mode and the end if in queue mode
- *
- * Return: pointer to the new node, or NULL on failure
+ * Return: If the line only contains delimiters - 1.
+ *         Otherwise - 0.
  */
-stack_t *add_node(stack_t **stack, const int n)
+int is_empty_line(char *line, char *delims)
 {
-	stack_t *new;
+	int i, j;
 
-	if (stack == NULL)
-		return (NULL);
-	new = malloc(sizeof(stack_t));
-	if (new == NULL)
-		return (NULL);
-	new->n = n;
-	if (*stack == NULL)
+	for (i = 0; line[i]; i++)
 	{
-		new->prev = new;
-		new->next = new;
+		for (j = 0; delims[j]; j++)
+		{
+			if (line[i] == delims[j])
+				break;
+		}
+		if (delims[j] == '\0')
+			return (0);
 	}
-	else
-	{
-		(*stack)->prev->next = new;
-		new->prev = (*stack)->prev;
-		(*stack)->prev = new;
-		new->next = *stack;
-	}
-	if (var.queue == STACK || var.stack_len == 0)
-		*stack = new;
-	return (new);
-}
 
-/**
- * m_fs_close - close file stream
- * @status: status passed to exit
- * @arg: pointer to file stream
- *
- * Return: void
- */
-void m_fs_close(int status, void *arg)
-{
-	FILE *fs;
-
-	(void)status;
-
-	fs = (FILE *) arg;
-	fclose(fs);
+	return (1);
 }
