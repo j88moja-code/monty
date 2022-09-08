@@ -1,11 +1,33 @@
 #ifndef _MONTY_HEADER_
 #define _MONTY_HEADER_
+#define _POSIX_C_SOURCE  200809L
+#define _GNU_SOURCE
 
 /* LIBRARIES */
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <unistd.h>
+
+#define STACK 0
+#define QUEUE 1
+
+/**
+ * struct var_s - struct to contain the main variables of the Monty interpreter
+ * @queue: flag to determine if in stack vs queue mode
+ * @stack_len: length of the stack
+ */
+typedef struct var_s
+{
+	int queue;
+	size_t stack_len;
+} var_t;
+
+/* GLOBAL OPCODE TOKENS */
+extern var_t var;
 
 /* STRUCS */
 /**
@@ -39,27 +61,23 @@ typedef struct instruction_s
 } instruction_t;
 
 /* PROTOTYPES */
+/* init */
+void get_op(char *op, stack_t **stack, unsigned int line_number);
+void free_stack(int status, void *arg);
+void m_fs_close(int status, void *arg);
+void free_lineptr(int status, void *arg);
+stack_t *add_node(stack_t **stack, const int n);
 
-void set_op_tok_error(int error_code);
+int check_for_digit(char *arg);
 
-/* error handling */
-int usage_error(void);
-int malloc_error(void);
-int f_open_error(char *filename);
-int unknown_op_error(char *opcode, unsigned int line_number);
-int no_int_error(unsigned int line_number);
-
-int short_stack_error(unsigned int line_number, char *op);
-int div_error(unsigned int line_number);
-int pop_error(unsigned int line_number);
-int div_error(unsigned int line_number);
-int pchar_error(unsigned int line_number, char *message);
-/* opcode functions */
-
+/* opcodes */
 void _push(stack_t **stack, unsigned int line_number);
 void _pall(stack_t **stack, unsigned int line_number);
 void _pint(stack_t **stack, unsigned int line_number);
 void _pop(stack_t **stack, unsigned int line_number);
 void _swap(stack_t **stack, unsigned int line_number);
 void _add(stack_t **stack, unsigned int line_number);
-void _nop(stack_t **stack, unsigned int line_number);
+void m_nop(stack_t **stack, unsigned int line_number);
+
+
+#endif /* _MONTY_HEADER_ */
