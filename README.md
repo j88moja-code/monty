@@ -32,5 +32,11 @@ The goal of this project is to create an interpreter for Monty ByteCodes files.
 * 14. rotr - Implement the `rotr` opcode.
 * 15. stack, queue - Implement the `stack` and `queue` opcodes.
 
+## [bf](https://github.com/j88moja-code/monty/tree/main/bf)
 
+From Wikipedia, Brainf_ck is an esoteric programming lanuage created in 1993 by Urban Müller - the language consists of only eight simple commands, a data pointer and an instruction pointer. While it is fully Turing complete, it is not intended for practical use, but to challenge and amuse programmers. Brainf_ck requires one to break commands into microscopic steps.
 
+* [1000-school.bf](https://github.com/j88moja-code/monty/blob/main/bf/1000-school.bf) - a Brainf_ck script that prints School, followed by a new line.
+* [1001-add.bf](https://github.com/j88moja-code/monty/blob/main/bf/1001-add.bf) - Adds two digits given by the user.
+* [1002-mul.bf](https://github.com/j88moja-code/monty/blob/main/bf/1002-mul.bf) - Multiply two digits given by the user
+* [1003-mul.bf]() - Multiply two digits given by the user.
