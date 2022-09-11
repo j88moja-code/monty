@@ -39,4 +39,4 @@ From Wikipedia, Brainf_ck is an esoteric programming lanuage created in 1993 by 
 * [1000-school.bf](https://github.com/j88moja-code/monty/blob/main/bf/1000-school.bf) - a Brainf_ck script that prints School, followed by a new line.
 * [1001-add.bf](https://github.com/j88moja-code/monty/blob/main/bf/1001-add.bf) - Adds two digits given by the user.
 * [1002-mul.bf](https://github.com/j88moja-code/monty/blob/main/bf/1002-mul.bf) - Multiply two digits given by the user
-* [1003-mul.bf]() - Multiply two digits given by the user.
+* [1003-mul.bf](https://github.com/j88moja-code/monty/blob/main/bf/1003-mul.bf) - Multiply two digits given by the user.
